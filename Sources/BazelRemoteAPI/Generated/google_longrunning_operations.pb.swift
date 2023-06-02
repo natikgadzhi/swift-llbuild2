@@ -287,6 +287,18 @@ public struct Google_Longrunning_OperationInfo {
   public init() {}
 }
 
+#if swift(>=5.5) && canImport(_Concurrency)
+extension Google_Longrunning_Operation: @unchecked Sendable {}
+extension Google_Longrunning_Operation.OneOf_Result: @unchecked Sendable {}
+extension Google_Longrunning_GetOperationRequest: @unchecked Sendable {}
+extension Google_Longrunning_ListOperationsRequest: @unchecked Sendable {}
+extension Google_Longrunning_ListOperationsResponse: @unchecked Sendable {}
+extension Google_Longrunning_CancelOperationRequest: @unchecked Sendable {}
+extension Google_Longrunning_DeleteOperationRequest: @unchecked Sendable {}
+extension Google_Longrunning_WaitOperationRequest: @unchecked Sendable {}
+extension Google_Longrunning_OperationInfo: @unchecked Sendable {}
+#endif  // swift(>=5.5) && canImport(_Concurrency)
+
 // MARK: - Extension support defined in operations.proto.
 
 // MARK: - Extension Properties
@@ -371,21 +383,29 @@ extension Google_Longrunning_Operation: SwiftProtobuf.Message, SwiftProtobuf._Me
       case 3: try { try decoder.decodeSingularBoolField(value: &self.done) }()
       case 4: try {
         var v: Google_Rpc_Status?
+        var hadOneofValue = false
         if let current = self.result {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .error(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.result = .error(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.result = .error(v)
+        }
       }()
       case 5: try {
         var v: SwiftProtobuf.Google_Protobuf_Any?
+        var hadOneofValue = false
         if let current = self.result {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .response(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.result = .response(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.result = .response(v)
+        }
       }()
       default: break
       }
@@ -393,18 +413,19 @@ extension Google_Longrunning_Operation: SwiftProtobuf.Message, SwiftProtobuf._Me
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.name.isEmpty {
       try visitor.visitSingularStringField(value: self.name, fieldNumber: 1)
     }
-    if let v = self._metadata {
+    try { if let v = self._metadata {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
+    } }()
     if self.done != false {
       try visitor.visitSingularBoolField(value: self.done, fieldNumber: 3)
     }
-    // The use of inline closures is to circumvent an issue where the compiler
-    // allocates stack space for every case branch when no optimizations are
-    // enabled. https://github.com/apple/swift-protobuf/issues/1034
     switch self.result {
     case .error?: try {
       guard case .error(let v)? = self.result else { preconditionFailure() }
@@ -634,12 +655,16 @@ extension Google_Longrunning_WaitOperationRequest: SwiftProtobuf.Message, SwiftP
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.name.isEmpty {
       try visitor.visitSingularStringField(value: self.name, fieldNumber: 1)
     }
-    if let v = self._timeout {
+    try { if let v = self._timeout {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 

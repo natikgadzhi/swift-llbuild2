@@ -249,6 +249,15 @@ public struct LLBActionExecutionRequestExtras {
   fileprivate var _owner: LLBLabel? = nil
 }
 
+#if swift(>=5.5) && canImport(_Concurrency)
+extension LLBActionExecutionKey: @unchecked Sendable {}
+extension LLBActionExecutionKey.OneOf_ActionExecutionType: @unchecked Sendable {}
+extension LLBActionExecutionValue: @unchecked Sendable {}
+extension LLBCommandActionExecution: @unchecked Sendable {}
+extension LLBMergeTreesActionExecution: @unchecked Sendable {}
+extension LLBActionExecutionRequestExtras: @unchecked Sendable {}
+#endif  // swift(>=5.5) && canImport(_Concurrency)
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 extension LLBActionExecutionKey: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
@@ -267,21 +276,29 @@ extension LLBActionExecutionKey: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
       switch fieldNumber {
       case 16: try {
         var v: LLBCommandActionExecution?
+        var hadOneofValue = false
         if let current = self.actionExecutionType {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .command(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.actionExecutionType = .command(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.actionExecutionType = .command(v)
+        }
       }()
       case 17: try {
         var v: LLBMergeTreesActionExecution?
+        var hadOneofValue = false
         if let current = self.actionExecutionType {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .mergeTrees(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.actionExecutionType = .mergeTrees(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.actionExecutionType = .mergeTrees(v)
+        }
       }()
       case 18: try { try decoder.decodeSingularMessageField(value: &self._chainedLogsID) }()
       default: break
@@ -291,8 +308,9 @@ extension LLBActionExecutionKey: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
-    // allocates stack space for every case branch when no optimizations are
-    // enabled. https://github.com/apple/swift-protobuf/issues/1034
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     switch self.actionExecutionType {
     case .command?: try {
       guard case .command(let v)? = self.actionExecutionType else { preconditionFailure() }
@@ -304,9 +322,9 @@ extension LLBActionExecutionKey: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
     }()
     case nil: break
     }
-    if let v = self._chainedLogsID {
+    try { if let v = self._chainedLogsID {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 18)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -343,12 +361,16 @@ extension LLBActionExecutionValue: SwiftProtobuf.Message, SwiftProtobuf._Message
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.outputs.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.outputs, fieldNumber: 1)
     }
-    if let v = self._stdoutID {
+    try { if let v = self._stdoutID {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
+    } }()
     if self.cachedFailure != false {
       try visitor.visitSingularBoolField(value: self.cachedFailure, fieldNumber: 3)
     }
@@ -403,9 +425,13 @@ extension LLBCommandActionExecution: SwiftProtobuf.Message, SwiftProtobuf._Messa
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._actionSpec {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._actionSpec {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     if !self.inputs.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.inputs, fieldNumber: 2)
     }
@@ -424,9 +450,9 @@ extension LLBCommandActionExecution: SwiftProtobuf.Message, SwiftProtobuf._Messa
     if self.cacheableFailure != false {
       try visitor.visitSingularBoolField(value: self.cacheableFailure, fieldNumber: 7)
     }
-    if let v = self._label {
+    try { if let v = self._label {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 8)
-    }
+    } }()
     if !self.unconditionalOutputs.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.unconditionalOutputs, fieldNumber: 9)
     }
@@ -503,15 +529,19 @@ extension LLBActionExecutionRequestExtras: SwiftProtobuf.Message, SwiftProtobuf.
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.mnemonic.isEmpty {
       try visitor.visitSingularStringField(value: self.mnemonic, fieldNumber: 1)
     }
     if !self.description_p.isEmpty {
       try visitor.visitSingularStringField(value: self.description_p, fieldNumber: 2)
     }
-    if let v = self._owner {
+    try { if let v = self._owner {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 

@@ -104,6 +104,11 @@ public struct LLBArtifactOwner {
   fileprivate var _actionsOwner: TSFCAS.LLBDataID? = nil
 }
 
+#if swift(>=5.5) && canImport(_Concurrency)
+extension LLBArtifactOwner: @unchecked Sendable {}
+extension LLBArtifactOwner.OneOf_OutputType: @unchecked Sendable {}
+#endif  // swift(>=5.5) && canImport(_Concurrency)
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 extension LLBArtifactOwner: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
@@ -124,16 +129,20 @@ extension LLBArtifactOwner: SwiftProtobuf.Message, SwiftProtobuf._MessageImpleme
       case 1: try { try decoder.decodeSingularMessageField(value: &self._actionsOwner) }()
       case 2: try { try decoder.decodeSingularInt32Field(value: &self.actionIndex) }()
       case 3: try {
-        if self.outputType != nil {try decoder.handleConflictingOneOf()}
         var v: Int32?
         try decoder.decodeSingularInt32Field(value: &v)
-        if let v = v {self.outputType = .outputIndex(v)}
+        if let v = v {
+          if self.outputType != nil {try decoder.handleConflictingOneOf()}
+          self.outputType = .outputIndex(v)
+        }
       }()
       case 4: try {
-        if self.outputType != nil {try decoder.handleConflictingOneOf()}
         var v: Int32?
         try decoder.decodeSingularInt32Field(value: &v)
-        if let v = v {self.outputType = .unconditionalOutputIndex(v)}
+        if let v = v {
+          if self.outputType != nil {try decoder.handleConflictingOneOf()}
+          self.outputType = .unconditionalOutputIndex(v)
+        }
       }()
       default: break
       }
@@ -141,15 +150,16 @@ extension LLBArtifactOwner: SwiftProtobuf.Message, SwiftProtobuf._MessageImpleme
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._actionsOwner {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._actionsOwner {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     if self.actionIndex != 0 {
       try visitor.visitSingularInt32Field(value: self.actionIndex, fieldNumber: 2)
     }
-    // The use of inline closures is to circumvent an issue where the compiler
-    // allocates stack space for every case branch when no optimizations are
-    // enabled. https://github.com/apple/swift-protobuf/issues/1034
     switch self.outputType {
     case .outputIndex?: try {
       guard case .outputIndex(let v)? = self.outputType else { preconditionFailure() }

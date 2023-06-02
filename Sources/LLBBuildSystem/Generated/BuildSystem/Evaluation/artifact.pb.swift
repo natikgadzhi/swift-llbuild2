@@ -121,6 +121,11 @@ public final class LLBArtifact {
   public init() {}
 }
 
+#if swift(>=5.5) && canImport(_Concurrency)
+extension LLBArtifact: @unchecked Sendable {}
+extension LLBArtifact.OneOf_OriginType: @unchecked Sendable {}
+#endif  // swift(>=5.5) && canImport(_Concurrency)
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 extension LLBArtifact: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
@@ -142,33 +147,45 @@ extension LLBArtifact: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementati
       switch fieldNumber {
       case 1: try {
         var v: TSFCAS.LLBDataID?
+        var hadOneofValue = false
         if let current = self.originType {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .source(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.originType = .source(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.originType = .source(v)
+        }
       }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.shortPath) }()
       case 3: try { try decoder.decodeRepeatedStringField(value: &self.roots) }()
       case 4: try { try decoder.decodeSingularEnumField(value: &self.type) }()
       case 5: try {
         var v: LLBArtifactOwner?
+        var hadOneofValue = false
         if let current = self.originType {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .derived(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.originType = .derived(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.originType = .derived(v)
+        }
       }()
       case 6: try {
         var v: TSFCAS.LLBDataID?
+        var hadOneofValue = false
         if let current = self.originType {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .derivedStatic(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.originType = .derivedStatic(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.originType = .derivedStatic(v)
+        }
       }()
       default: break
       }
@@ -176,9 +193,13 @@ extension LLBArtifact: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementati
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if case .source(let v)? = self.originType {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if case .source(let v)? = self.originType {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     if !self.shortPath.isEmpty {
       try visitor.visitSingularStringField(value: self.shortPath, fieldNumber: 2)
     }
@@ -188,9 +209,6 @@ extension LLBArtifact: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementati
     if self.type != .file {
       try visitor.visitSingularEnumField(value: self.type, fieldNumber: 4)
     }
-    // The use of inline closures is to circumvent an issue where the compiler
-    // allocates stack space for every case branch when no optimizations are
-    // enabled. https://github.com/apple/swift-protobuf/issues/1034
     switch self.originType {
     case .derived?: try {
       guard case .derived(let v)? = self.originType else { preconditionFailure() }

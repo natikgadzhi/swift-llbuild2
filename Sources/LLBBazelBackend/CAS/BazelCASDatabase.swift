@@ -24,9 +24,9 @@ public final class LLBBazelCASDatabase {
 
     private let connection: ClientConnection
     private let headers: [GRPCHeader]
-    private let bytestreamClient: Google_Bytestream_ByteStreamClient
+    private var bytestreamClient: Google_Bytestream_ByteStreamNIOClient
     private let bytestreamUUID = UUID()
-    private let casClient: ContentAddressableStorageClient
+    private var casClient: ContentAddressableStorageClient
     private let instance: String?
 
     public enum Error: Swift.Error {
@@ -69,7 +69,7 @@ public final class LLBBazelCASDatabase {
             eventLoopGroup: group
         )
         self.connection = ClientConnection(configuration: configuration)
-        self.bytestreamClient = Google_Bytestream_ByteStreamClient(channel: connection)
+        self.bytestreamClient = Google_Bytestream_ByteStreamNIOClient(channel: connection)
         self.bytestreamClient.defaultCallOptions.customMetadata.add(contentsOf: headers)
         self.casClient = ContentAddressableStorageClient(channel: connection)
         self.casClient.defaultCallOptions.customMetadata.add(contentsOf: headers)
@@ -103,7 +103,7 @@ public final class LLBBazelCASDatabase {
             request = GetCapabilitiesRequest()
         }
 
-        let client = CapabilitiesClient(channel: connection)
+        var client = CapabilitiesClient(channel: connection)
         client.defaultCallOptions.customMetadata.add(contentsOf: headers)
 
         return client.getCapabilities(request).response

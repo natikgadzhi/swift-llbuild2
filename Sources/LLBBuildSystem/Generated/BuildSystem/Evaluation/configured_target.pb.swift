@@ -177,6 +177,13 @@ extension LLBNamedConfiguredTargetDependency.TypeEnum: CaseIterable {
 
 #endif  // swift(>=4.2)
 
+#if swift(>=5.5) && canImport(_Concurrency)
+extension LLBConfiguredTargetKey: @unchecked Sendable {}
+extension LLBConfiguredTargetValue: @unchecked Sendable {}
+extension LLBNamedConfiguredTargetDependency: @unchecked Sendable {}
+extension LLBNamedConfiguredTargetDependency.TypeEnum: @unchecked Sendable {}
+#endif  // swift(>=5.5) && canImport(_Concurrency)
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 extension LLBConfiguredTargetKey: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
@@ -202,15 +209,19 @@ extension LLBConfiguredTargetKey: SwiftProtobuf.Message, SwiftProtobuf._MessageI
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._rootID {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._rootID {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
-    if let v = self._label {
+    } }()
+    try { if let v = self._label {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
-    if let v = self._configurationKey {
+    } }()
+    try { if let v = self._configurationKey {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -244,9 +255,13 @@ extension LLBConfiguredTargetValue: SwiftProtobuf.Message, SwiftProtobuf._Messag
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._serializedConfiguredTarget {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._serializedConfiguredTarget {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     if !self.targetDependencies.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.targetDependencies, fieldNumber: 2)
     }

@@ -136,6 +136,12 @@ public struct LLBRuleEvaluationValue {
   fileprivate var _providerMap: LLBProviderMap? = nil
 }
 
+#if swift(>=5.5) && canImport(_Concurrency)
+extension LLBRuleEvaluationKeyID: @unchecked Sendable {}
+extension LLBRuleEvaluationKey: @unchecked Sendable {}
+extension LLBRuleEvaluationValue: @unchecked Sendable {}
+#endif  // swift(>=5.5) && canImport(_Concurrency)
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 extension LLBRuleEvaluationKeyID: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
@@ -157,9 +163,13 @@ extension LLBRuleEvaluationKeyID: SwiftProtobuf.Message, SwiftProtobuf._MessageI
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._ruleEvaluationKeyID {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._ruleEvaluationKeyID {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -193,15 +203,19 @@ extension LLBRuleEvaluationKey: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._label {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._label {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
-    if let v = self._configuredTargetValue {
+    } }()
+    try { if let v = self._configuredTargetValue {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
-    if let v = self._configurationKey {
+    } }()
+    try { if let v = self._configurationKey {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -235,12 +249,16 @@ extension LLBRuleEvaluationValue: SwiftProtobuf.Message, SwiftProtobuf._MessageI
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.actionIds.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.actionIds, fieldNumber: 1)
     }
-    if let v = self._providerMap {
+    try { if let v = self._providerMap {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 

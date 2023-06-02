@@ -58,6 +58,11 @@ public struct LLBActionConfigurationFragment {
   public init() {}
 }
 
+#if swift(>=5.5) && canImport(_Concurrency)
+extension LLBActionConfigurationFragmentKey: @unchecked Sendable {}
+extension LLBActionConfigurationFragment: @unchecked Sendable {}
+#endif  // swift(>=5.5) && canImport(_Concurrency)
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 extension LLBActionConfigurationFragmentKey: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
