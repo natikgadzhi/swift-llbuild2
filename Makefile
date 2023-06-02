@@ -40,6 +40,7 @@ clone-external-protos: clone-external-repos
 		--include LICENSE \
 		--include api/annotations.proto \
 		--include api/client.proto \
+		--include api/launch_stage.proto \
 		--include api/http.proto \
 		--include bytestream/\*.proto \
 		--include longrunning/\*.proto \
@@ -78,7 +79,9 @@ generate-protos: proto-toolchain Protos/BazelRemoteAPI
 		--plugin=Utilities/tools/bin/protoc-gen-grpc-swift \
 		--swift_out=Sources/BazelRemoteAPI/Generated \
 		--swift_opt=Visibility=Public \
+		--swift_opt=FileNaming=PathToUnderscores \
 		--grpc-swift_opt=Visibility=Public \
+		--grpc-swift_opt=FileNaming=PathToUnderscores \
 		--grpc-swift_out=Sources/BazelRemoteAPI/Generated \
 		$$(find Protos/BazelRemoteAPI -name \*.proto)
 
