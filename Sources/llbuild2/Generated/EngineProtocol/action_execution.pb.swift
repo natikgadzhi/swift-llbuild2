@@ -300,6 +300,17 @@ public struct LLBActionExecutionResponse {
   fileprivate var _stdoutID: TSFCAS.LLBDataID? = nil
 }
 
+#if swift(>=5.5) && canImport(_Concurrency)
+extension LLBArtifactType: @unchecked Sendable {}
+extension LLBActionInput: @unchecked Sendable {}
+extension LLBActionOutput: @unchecked Sendable {}
+extension LLBEnvironmentVariable: @unchecked Sendable {}
+extension LLBActionSpec: @unchecked Sendable {}
+extension LLBPreActionSpec: @unchecked Sendable {}
+extension LLBActionExecutionRequest: @unchecked Sendable {}
+extension LLBActionExecutionResponse: @unchecked Sendable {}
+#endif  // swift(>=5.5) && canImport(_Concurrency)
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 extension LLBArtifactType: SwiftProtobuf._ProtoNameProviding {
@@ -333,12 +344,16 @@ extension LLBActionInput: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.path.isEmpty {
       try visitor.visitSingularStringField(value: self.path, fieldNumber: 1)
     }
-    if let v = self._dataID {
+    try { if let v = self._dataID {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
+    } }()
     if self.type != .file {
       try visitor.visitSingularEnumField(value: self.type, fieldNumber: 3)
     }
@@ -555,9 +570,13 @@ extension LLBActionExecutionRequest: SwiftProtobuf.Message, SwiftProtobuf._Messa
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._actionSpec {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._actionSpec {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     if !self.inputs.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.inputs, fieldNumber: 2)
     }
@@ -570,12 +589,12 @@ extension LLBActionExecutionRequest: SwiftProtobuf.Message, SwiftProtobuf._Messa
     if !self.additionalData.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.additionalData, fieldNumber: 5)
     }
-    if let v = self._baseLogsID {
+    try { if let v = self._baseLogsID {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 6)
-    }
-    if let v = self._functionID {
+    } }()
+    try { if let v = self._functionID {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 7)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -619,15 +638,19 @@ extension LLBActionExecutionResponse: SwiftProtobuf.Message, SwiftProtobuf._Mess
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.outputs.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.outputs, fieldNumber: 1)
     }
     if self.exitCode != 0 {
       try visitor.visitSingularInt32Field(value: self.exitCode, fieldNumber: 2)
     }
-    if let v = self._stdoutID {
+    try { if let v = self._stdoutID {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
-    }
+    } }()
     if !self.additionalData.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.additionalData, fieldNumber: 4)
     }

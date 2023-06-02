@@ -168,6 +168,15 @@ public struct Google_Bytestream_QueryWriteStatusResponse {
   public init() {}
 }
 
+#if swift(>=5.5) && canImport(_Concurrency)
+extension Google_Bytestream_ReadRequest: @unchecked Sendable {}
+extension Google_Bytestream_ReadResponse: @unchecked Sendable {}
+extension Google_Bytestream_WriteRequest: @unchecked Sendable {}
+extension Google_Bytestream_WriteResponse: @unchecked Sendable {}
+extension Google_Bytestream_QueryWriteStatusRequest: @unchecked Sendable {}
+extension Google_Bytestream_QueryWriteStatusResponse: @unchecked Sendable {}
+#endif  // swift(>=5.5) && canImport(_Concurrency)
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 fileprivate let _protobuf_package = "google.bytestream"

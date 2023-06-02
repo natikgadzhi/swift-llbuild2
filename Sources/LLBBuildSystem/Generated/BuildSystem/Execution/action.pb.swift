@@ -255,6 +255,15 @@ public struct LLBMergeTreesActionInput {
   fileprivate var _artifact: LLBArtifact? = nil
 }
 
+#if swift(>=5.5) && canImport(_Concurrency)
+extension LLBActionKey: @unchecked Sendable {}
+extension LLBActionKey.OneOf_ActionType: @unchecked Sendable {}
+extension LLBActionValue: @unchecked Sendable {}
+extension LLBCommandAction: @unchecked Sendable {}
+extension LLBMergeTreesAction: @unchecked Sendable {}
+extension LLBMergeTreesActionInput: @unchecked Sendable {}
+#endif  // swift(>=5.5) && canImport(_Concurrency)
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 extension LLBActionKey: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
@@ -296,21 +305,29 @@ extension LLBActionKey: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
         switch fieldNumber {
         case 1: try {
           var v: LLBCommandAction?
+          var hadOneofValue = false
           if let current = _storage._actionType {
-            try decoder.handleConflictingOneOf()
+            hadOneofValue = true
             if case .command(let m) = current {v = m}
           }
           try decoder.decodeSingularMessageField(value: &v)
-          if let v = v {_storage._actionType = .command(v)}
+          if let v = v {
+            if hadOneofValue {try decoder.handleConflictingOneOf()}
+            _storage._actionType = .command(v)
+          }
         }()
         case 2: try {
           var v: LLBMergeTreesAction?
+          var hadOneofValue = false
           if let current = _storage._actionType {
-            try decoder.handleConflictingOneOf()
+            hadOneofValue = true
             if case .mergeTrees(let m) = current {v = m}
           }
           try decoder.decodeSingularMessageField(value: &v)
-          if let v = v {_storage._actionType = .mergeTrees(v)}
+          if let v = v {
+            if hadOneofValue {try decoder.handleConflictingOneOf()}
+            _storage._actionType = .mergeTrees(v)
+          }
         }()
         case 3: try { try decoder.decodeSingularMessageField(value: &_storage._chainedInput) }()
         default: break
@@ -322,8 +339,9 @@ extension LLBActionKey: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
       // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      // allocates stack space for every if/case branch local when no optimizations
+      // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+      // https://github.com/apple/swift-protobuf/issues/1182
       switch _storage._actionType {
       case .command?: try {
         guard case .command(let v)? = _storage._actionType else { preconditionFailure() }
@@ -335,9 +353,9 @@ extension LLBActionKey: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
       }()
       case nil: break
       }
-      if let v = _storage._chainedInput {
+      try { if let v = _storage._chainedInput {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
-      }
+      } }()
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -381,12 +399,16 @@ extension LLBActionValue: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.outputs.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.outputs, fieldNumber: 1)
     }
-    if let v = self._stdoutID {
+    try { if let v = self._stdoutID {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
+    } }()
     if !self.unconditionalOutputs.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.unconditionalOutputs, fieldNumber: 3)
     }
@@ -437,9 +459,13 @@ extension LLBCommandAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImpleme
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._actionSpec {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._actionSpec {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     if !self.inputs.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.inputs, fieldNumber: 2)
     }
@@ -458,9 +484,9 @@ extension LLBCommandAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImpleme
     if self.cacheableFailure != false {
       try visitor.visitSingularBoolField(value: self.cacheableFailure, fieldNumber: 7)
     }
-    if let v = self._label {
+    try { if let v = self._label {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 8)
-    }
+    } }()
     if !self.unconditionalOutputs.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.unconditionalOutputs, fieldNumber: 9)
     }
@@ -535,9 +561,13 @@ extension LLBMergeTreesActionInput: SwiftProtobuf.Message, SwiftProtobuf._Messag
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._artifact {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._artifact {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     if !self.path.isEmpty {
       try visitor.visitSingularStringField(value: self.path, fieldNumber: 2)
     }

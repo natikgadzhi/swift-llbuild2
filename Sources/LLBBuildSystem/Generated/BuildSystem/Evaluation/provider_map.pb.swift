@@ -45,6 +45,10 @@ public struct LLBProviderMap {
   public init() {}
 }
 
+#if swift(>=5.5) && canImport(_Concurrency)
+extension LLBProviderMap: @unchecked Sendable {}
+#endif  // swift(>=5.5) && canImport(_Concurrency)
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 extension LLBProviderMap: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {

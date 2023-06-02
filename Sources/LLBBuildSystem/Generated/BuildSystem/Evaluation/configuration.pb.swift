@@ -64,6 +64,11 @@ public struct LLBConfigurationValue {
   public init() {}
 }
 
+#if swift(>=5.5) && canImport(_Concurrency)
+extension LLBConfigurationKey: @unchecked Sendable {}
+extension LLBConfigurationValue: @unchecked Sendable {}
+#endif  // swift(>=5.5) && canImport(_Concurrency)
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 extension LLBConfigurationKey: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {

@@ -163,6 +163,8 @@ public struct Build_Bazel_Remote_Asset_V1_FetchBlobResponse {
   ///   requested an asset from a disallowed origin.
   /// * `ABORTED`: The operation could not be completed, typically due to a
   ///   failed consistency check.
+  /// * `RESOURCE_EXHAUSTED`: There is insufficient quota of some resource to
+  ///   perform the requested operation. The client may retry after a delay.
   public var status: Google_Rpc_Status {
     get {return _status ?? Google_Rpc_Status()}
     set {_status = newValue}
@@ -300,6 +302,8 @@ public struct Build_Bazel_Remote_Asset_V1_FetchDirectoryResponse {
   ///   requested an asset from a disallowed origin.
   /// * `ABORTED`: The operation could not be completed, typically due to a
   ///   failed consistency check.
+  /// * `RESOURCE_EXHAUSTED`: There is insufficient quota of some resource to
+  ///   perform the requested operation. The client may retry after a delay.
   public var status: Google_Rpc_Status {
     get {return _status ?? Google_Rpc_Status()}
     set {_status = newValue}
@@ -495,6 +499,18 @@ public struct Build_Bazel_Remote_Asset_V1_PushDirectoryResponse {
   public init() {}
 }
 
+#if swift(>=5.5) && canImport(_Concurrency)
+extension Build_Bazel_Remote_Asset_V1_Qualifier: @unchecked Sendable {}
+extension Build_Bazel_Remote_Asset_V1_FetchBlobRequest: @unchecked Sendable {}
+extension Build_Bazel_Remote_Asset_V1_FetchBlobResponse: @unchecked Sendable {}
+extension Build_Bazel_Remote_Asset_V1_FetchDirectoryRequest: @unchecked Sendable {}
+extension Build_Bazel_Remote_Asset_V1_FetchDirectoryResponse: @unchecked Sendable {}
+extension Build_Bazel_Remote_Asset_V1_PushBlobRequest: @unchecked Sendable {}
+extension Build_Bazel_Remote_Asset_V1_PushBlobResponse: @unchecked Sendable {}
+extension Build_Bazel_Remote_Asset_V1_PushDirectoryRequest: @unchecked Sendable {}
+extension Build_Bazel_Remote_Asset_V1_PushDirectoryResponse: @unchecked Sendable {}
+#endif  // swift(>=5.5) && canImport(_Concurrency)
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 fileprivate let _protobuf_package = "build.bazel.remote.asset.v1"
@@ -564,15 +580,19 @@ extension Build_Bazel_Remote_Asset_V1_FetchBlobRequest: SwiftProtobuf.Message, S
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.instanceName.isEmpty {
       try visitor.visitSingularStringField(value: self.instanceName, fieldNumber: 1)
     }
-    if let v = self._timeout {
+    try { if let v = self._timeout {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
-    if let v = self._oldestContentAccepted {
+    } }()
+    try { if let v = self._oldestContentAccepted {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
-    }
+    } }()
     if !self.uris.isEmpty {
       try visitor.visitRepeatedStringField(value: self.uris, fieldNumber: 4)
     }
@@ -620,21 +640,25 @@ extension Build_Bazel_Remote_Asset_V1_FetchBlobResponse: SwiftProtobuf.Message, 
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._status {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._status {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     if !self.uri.isEmpty {
       try visitor.visitSingularStringField(value: self.uri, fieldNumber: 2)
     }
     if !self.qualifiers.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.qualifiers, fieldNumber: 3)
     }
-    if let v = self._expiresAt {
+    try { if let v = self._expiresAt {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
-    }
-    if let v = self._blobDigest {
+    } }()
+    try { if let v = self._blobDigest {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -676,15 +700,19 @@ extension Build_Bazel_Remote_Asset_V1_FetchDirectoryRequest: SwiftProtobuf.Messa
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.instanceName.isEmpty {
       try visitor.visitSingularStringField(value: self.instanceName, fieldNumber: 1)
     }
-    if let v = self._timeout {
+    try { if let v = self._timeout {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
-    if let v = self._oldestContentAccepted {
+    } }()
+    try { if let v = self._oldestContentAccepted {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
-    }
+    } }()
     if !self.uris.isEmpty {
       try visitor.visitRepeatedStringField(value: self.uris, fieldNumber: 4)
     }
@@ -732,21 +760,25 @@ extension Build_Bazel_Remote_Asset_V1_FetchDirectoryResponse: SwiftProtobuf.Mess
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._status {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._status {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     if !self.uri.isEmpty {
       try visitor.visitSingularStringField(value: self.uri, fieldNumber: 2)
     }
     if !self.qualifiers.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.qualifiers, fieldNumber: 3)
     }
-    if let v = self._expiresAt {
+    try { if let v = self._expiresAt {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
-    }
-    if let v = self._rootDirectoryDigest {
+    } }()
+    try { if let v = self._rootDirectoryDigest {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -792,6 +824,10 @@ extension Build_Bazel_Remote_Asset_V1_PushBlobRequest: SwiftProtobuf.Message, Sw
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.instanceName.isEmpty {
       try visitor.visitSingularStringField(value: self.instanceName, fieldNumber: 1)
     }
@@ -801,12 +837,12 @@ extension Build_Bazel_Remote_Asset_V1_PushBlobRequest: SwiftProtobuf.Message, Sw
     if !self.qualifiers.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.qualifiers, fieldNumber: 3)
     }
-    if let v = self._expireAt {
+    try { if let v = self._expireAt {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
-    }
-    if let v = self._blobDigest {
+    } }()
+    try { if let v = self._blobDigest {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
-    }
+    } }()
     if !self.referencesBlobs.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.referencesBlobs, fieldNumber: 6)
     }
@@ -879,6 +915,10 @@ extension Build_Bazel_Remote_Asset_V1_PushDirectoryRequest: SwiftProtobuf.Messag
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.instanceName.isEmpty {
       try visitor.visitSingularStringField(value: self.instanceName, fieldNumber: 1)
     }
@@ -888,12 +928,12 @@ extension Build_Bazel_Remote_Asset_V1_PushDirectoryRequest: SwiftProtobuf.Messag
     if !self.qualifiers.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.qualifiers, fieldNumber: 3)
     }
-    if let v = self._expireAt {
+    try { if let v = self._expireAt {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
-    }
-    if let v = self._rootDirectoryDigest {
+    } }()
+    try { if let v = self._rootDirectoryDigest {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
-    }
+    } }()
     if !self.referencesBlobs.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.referencesBlobs, fieldNumber: 6)
     }
